@@ -1,4 +1,4 @@
-package com.example.window;
+package com.example.twitter_mini;
 
 import org.junit.Test;
 
