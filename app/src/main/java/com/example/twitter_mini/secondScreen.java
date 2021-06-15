@@ -1,8 +1,12 @@
 package com.example.twitter_mini;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -10,15 +14,22 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class secondScreen extends AppCompatActivity {
 
@@ -68,7 +79,93 @@ public class secondScreen extends AppCompatActivity {
                 ref.child("users").child(myUid).child("seguindo").setValue(following);
             }
         });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            finish();
+        } else {
+            myUid = user.getUid();
+            ref.child("users").child(myUid).child("nome").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    myName = dataSnapshot.getValue(String.class);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+            userids.clear();
+            users.clear();
+            childEventListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if(!dataSnapshot.child("uid").getValue(String.class).equals(myUid)){
+                        users.add(dataSnapshot.child("nome").getValue(String.class));
+                        userids.add(dataSnapshot.child("uid").getValue(String.class));
+                        arrayAdapter.notifyDataSetChanged();
+                        updateList();
+                    }
+
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+            ref.child("users").addChildEventListener(childEventListener);
+
+            valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    following.clear();
+                    for(DataSnapshot data:dataSnapshot.getChildren()){
+                        following.add(data.getValue(String.class));
+                    }
+                    Log.d("Log", "Following: " + following);
+                    updateList();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+            ref.child("users").child(myUid).child("Following").addValueEventListener(valueEventListener);
+        }
+    }
+
+    public void updateList(){
+        for(String uid:userids){
+            if(following.contains(uid)){
+                listView.setItemChecked(userids.indexOf(uid), true);
+            } else {
+                listView.setItemChecked(userids.indexOf(uid), false);
+            }
+        }
     }
 
     @Override
@@ -77,19 +174,65 @@ public class secondScreen extends AppCompatActivity {
         return true;
     }
 
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item){
-        int option=item.getItemId();
 
-       if(option==R.id.feed){
+        int option = item.getItemId();
 
-       }else if(option==R.id.tweet){
+        if (option == R.id.feed) {
 
-       }else if(option==R.id.logout){
-           FirebaseAuth.getInstance().signOut();
-           finish();
-       }
 
-       return super.onOptionsItemSelected(item);
+
+            Intent i = new Intent(getApplicationContext(), MyFeeds.class);
+            i.putStringArrayListExtra("following", following);
+            startActivity(i);
+
+
+        }else if (option == R.id.tweet) {
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setTitle("Enviar um tweet");
+            final EditText conteudoTweet = new EditText(this);
+            builder.setView(conteudoTweet);
+
+            builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    Map<String, Object> tweet = new HashMap<>();
+                    tweet.put("messagem", conteudoTweet.getText().toString());
+                    tweet.put("uid", myUid);
+                    tweet.put("data", -1 * System.currentTimeMillis());
+                    tweet.put("name", myName);
+                    ref.child("tweets").push().setValue(tweet);
+
+                    Toast.makeText(getApplicationContext(), "tweet send", Toast.LENGTH_LONG).show();
+                }
+            });
+
+            builder.setNegativeButton("Canceled", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                    dialog.cancel();
+
+                }
+            });
+
+            builder.show();
+
+            return true;
+
+
+        } else if (option == R.id.logout) {
+            FirebaseAuth.getInstance().signOut();
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }
