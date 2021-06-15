@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">twitter_mini</string>
+    <string name="login">login</string>
+    <string name="signup">signup</string>
+    <string name="name">nome</string>
+    <string name="email">email</string>
+    <string name="password">senha</string>
 </resources>
