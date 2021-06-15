@@ -5,4 +5,7 @@
     <string name="name">nome</string>
     <string name="email">email</string>
     <string name="password">senha</string>
+    <string name="tweet">Tweet</string>
+    <string name="my_feed">My Feed</string>
+    <string name="logout">Logout</string>
 </resources>

@@ -5,12 +5,12 @@
     tools:context="com.example.twitter_mini">
 
     <item android:id="@+id/tweet"
-        android:title="Tweet" />
+        android:title="@string/tweet" />
 
     <item android:id="@+id/feed"
-        android:title="My Feed" />
+        android:title="@string/my_feed" />
 
     <item android:id="@+id/logout"
-        android:title="Logout" />
+        android:title="@string/logout" />
 
 </menu>
