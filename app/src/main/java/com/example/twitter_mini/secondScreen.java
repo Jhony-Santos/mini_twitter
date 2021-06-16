@@ -76,7 +76,7 @@ public class secondScreen extends AppCompatActivity {
                     following.remove(following.indexOf(userids.get(position)));
                 }
 
-                ref.child("users").child(myUid).child("seguindo").setValue(following);
+                ref.child("users").child(myUid).child("Following").setValue(following);
             }
         });
     }
@@ -90,7 +90,7 @@ public class secondScreen extends AppCompatActivity {
             finish();
         } else {
             myUid = user.getUid();
-            ref.child("users").child(myUid).child("nome").addListenerForSingleValueEvent(new ValueEventListener() {
+            ref.child("users").child(myUid).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     myName = dataSnapshot.getValue(String.class);
@@ -108,7 +108,7 @@ public class secondScreen extends AppCompatActivity {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     if(!dataSnapshot.child("uid").getValue(String.class).equals(myUid)){
-                        users.add(dataSnapshot.child("nome").getValue(String.class));
+                        users.add(dataSnapshot.child("name").getValue(String.class));
                         userids.add(dataSnapshot.child("uid").getValue(String.class));
                         arrayAdapter.notifyDataSetChanged();
                         updateList();
@@ -194,16 +194,16 @@ public class secondScreen extends AppCompatActivity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-            builder.setTitle("Enviar um tweet");
+            builder.setTitle("Send a tweet");
             final EditText conteudoTweet = new EditText(this);
             builder.setView(conteudoTweet);
 
-            builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
                     Map<String, Object> tweet = new HashMap<>();
-                    tweet.put("messagem", conteudoTweet.getText().toString());
+                    tweet.put("message", conteudoTweet.getText().toString());
                     tweet.put("uid", myUid);
                     tweet.put("data", -1 * System.currentTimeMillis());
                     tweet.put("name", myName);

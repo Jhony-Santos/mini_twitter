@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Twitter_mini">
+        <activity android:name=".MyFeeds"></activity>
         <activity android:name=".secondScreen" />
         <activity android:name=".MainActivity">
             <intent-filter>
