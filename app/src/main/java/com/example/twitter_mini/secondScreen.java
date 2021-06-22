@@ -111,7 +111,7 @@ public class secondScreen extends AppCompatActivity {
             childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if(dataSnapshot.child("id").getValue(String.class)!=null){
+                    if(dataSnapshot.child("id").getValue(String.class)!=null ){
 
                         if(!dataSnapshot.child("id").getValue(String.class).equals(myId)){
                             users.add(dataSnapshot.child("name").getValue(String.class));
@@ -119,12 +119,10 @@ public class secondScreen extends AppCompatActivity {
                             arrayAdapter.notifyDataSetChanged();
                             updateList();
                         }
-
-
                     }
 
                     else{
-                        System.out.println("VALOR NULO");
+                        System.out.println("O valor é nulo");
                     }
 
 
