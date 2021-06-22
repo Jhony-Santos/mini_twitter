@@ -46,7 +46,7 @@ public class secondScreen extends AppCompatActivity {
     private ChildEventListener childEventListener;
     private ValueEventListener valueEventListener;
 
-    private String myUid;
+    private String myId;
     private String myName;
 
 
@@ -54,6 +54,7 @@ public class secondScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_second_screen);
 
         following = new ArrayList<>();
@@ -76,7 +77,7 @@ public class secondScreen extends AppCompatActivity {
                     following.remove(following.indexOf(userids.get(position)));
                 }
 
-                ref.child("users").child(myUid).child("Following").setValue(following);
+                ref.child("users").child(myId).child("following").setValue(following);
             }
         });
     }
@@ -86,11 +87,14 @@ public class secondScreen extends AppCompatActivity {
         super.onStart();
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
         if (user == null) {
             finish();
         } else {
-            myUid = user.getUid();
-            ref.child("users").child(myUid).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
+            myId = user.getUid();
+            System.out.println(myId);
+            ref.child("users").child(myId).child("name").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     myName = dataSnapshot.getValue(String.class);
@@ -107,12 +111,22 @@ public class secondScreen extends AppCompatActivity {
             childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    if(!dataSnapshot.child("uid").getValue(String.class).equals(myUid)){
-                        users.add(dataSnapshot.child("name").getValue(String.class));
-                        userids.add(dataSnapshot.child("uid").getValue(String.class));
-                        arrayAdapter.notifyDataSetChanged();
-                        updateList();
+                    if(dataSnapshot.child("id").getValue(String.class)!=null){
+
+                        if(!dataSnapshot.child("id").getValue(String.class).equals(myId)){
+                            users.add(dataSnapshot.child("name").getValue(String.class));
+                            userids.add(dataSnapshot.child("id").getValue(String.class));
+                            arrayAdapter.notifyDataSetChanged();
+                            updateList();
+                        }
+
+
                     }
+
+                    else{
+                        System.out.println("VALOR NULO");
+                    }
+
 
                 }
 
@@ -145,7 +159,7 @@ public class secondScreen extends AppCompatActivity {
                     for(DataSnapshot data:dataSnapshot.getChildren()){
                         following.add(data.getValue(String.class));
                     }
-                    Log.d("Log", "Following: " + following);
+                    Log.d("Log", "following: " + following);
                     updateList();
                 }
 
@@ -154,7 +168,7 @@ public class secondScreen extends AppCompatActivity {
 
                 }
             };
-            ref.child("users").child(myUid).child("Following").addValueEventListener(valueEventListener);
+            ref.child("users").child(myId).child("following").addValueEventListener(valueEventListener);
         }
     }
 
@@ -182,8 +196,6 @@ public class secondScreen extends AppCompatActivity {
 
         if (option == R.id.feed) {
 
-
-
             Intent i = new Intent(getApplicationContext(), MyFeeds.class);
             i.putStringArrayListExtra("following", following);
             startActivity(i);
@@ -204,7 +216,7 @@ public class secondScreen extends AppCompatActivity {
 
                     Map<String, Object> tweet = new HashMap<>();
                     tweet.put("message", conteudoTweet.getText().toString());
-                    tweet.put("uid", myUid);
+                    tweet.put("id", myId);
                     tweet.put("data", -1 * System.currentTimeMillis());
                     tweet.put("name", myName);
                     ref.child("tweets").push().setValue(tweet);
@@ -213,7 +225,7 @@ public class secondScreen extends AppCompatActivity {
                 }
             });
 
-            builder.setNegativeButton("Canceled", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton("canceled", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
 
