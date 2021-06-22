@@ -71,13 +71,19 @@ public class MyFeeds extends AppCompatActivity {
         childEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if(following.contains(dataSnapshot.child("uid").getValue(String.class)) || dataSnapshot.child("uid").getValue(String.class).equals(myUid)){
-                    Map<String, String> tweet = new HashMap<>(2);
-                    tweet.put("content", dataSnapshot.child("msg").getValue(String.class));
-                    tweet.put("username", dataSnapshot.child("nome").getValue(String.class));
-                    tweetData.add(tweet);
-                    simpleAdapter.notifyDataSetChanged();
+
+                if(dataSnapshot.child("id").getValue(String.class)!=null){
+
+                    if(following.contains(dataSnapshot.child("id").getValue(String.class)) || dataSnapshot.child("id").getValue(String.class).equals(myUid)){
+                        Map<String, String> tweet = new HashMap<>(2);
+                        tweet.put("content", dataSnapshot.child("message").getValue(String.class));
+                        tweet.put("username", dataSnapshot.child("name").getValue(String.class));
+                        tweetData.add(tweet);
+                        simpleAdapter.notifyDataSetChanged();
+                    }
+
                 }
+
             }
 
             @Override
