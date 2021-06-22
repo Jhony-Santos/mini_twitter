@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
                 if(user !=null){
                     Log.d("Log","User connected:" + user.getUid() );
                     Intent intent = new Intent(getApplicationContext(),secondScreen.class);
+                    intent.putExtra("usuario",user);
                     startActivity(intent);
                 }
                 else{
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickLogin(View view){
-        auth.signInWithEmailAndPassword(fieldEmail.getText().toString(), fieldPassword.getText().toString())
+        auth.signInWithEmailAndPassword(fieldEmail.getText().toString().trim(), fieldPassword.getText().toString().trim())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -100,13 +101,11 @@ public class MainActivity extends AppCompatActivity {
                             DatabaseReference ref = database.getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                             //salving the user in the database firebase
-                            ref.child("Name").setValue(fieldName.getText().toString());
-                            ref.child("Id").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            ref.child("name").setValue(fieldName.getText().toString());
+                            ref.child("id").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
                         }
                     }
                 });
         }
-
-
 
 }
